@@ -8,7 +8,7 @@ use xml5ever::tokenizer::{Doctype, DoctypeToken, EOFToken};
 use xml5ever::tokenizer::{ParseError, Token, TokenSink, XmlTokenizer};
 use crate::manifest::manifest_data::ManifestData;
 use std::borrow::{Borrow, BorrowMut};
-use crate::manifest::android_manifest::{NODE_MANIFEST, ATTRIBUTE_PACKAGE};
+use crate::manifest::android_manifest::{NODE_MANIFEST, ATTRIBUTE_PACKAGE, ATTRIBUTE_VERSIONCODE, ATTRIBUTE_VERSIONNAME};
 use xml5ever::tree_builder::XmlTreeBuilder;
 
 #[derive(Clone, Debug)]
@@ -39,6 +39,12 @@ impl TokenSink for SimpleTokenPrinter {
                                 let local_name = &*attr.name.local;
                                 if local_name == ATTRIBUTE_PACKAGE {
                                     self.manifest_data.m_package = attr.value.parse().unwrap();
+                                }
+                                if local_name == ATTRIBUTE_VERSIONCODE {
+                                    self.manifest_data.m_version_code = attr.value.parse().unwrap();
+                                }
+                                if local_name == ATTRIBUTE_VERSIONNAME {
+                                    self.manifest_data.m_version_name = attr.value.parse().unwrap();
                                 }
                             }
                         }
@@ -108,5 +114,7 @@ mod tests {
 
         let data = AndroidManifestParser::parse(buffer);
         assert_eq!("com.android.testapp", data.m_package);
+        assert_eq!(42, data.m_version_code);
+        assert_eq!("1.42", data.m_version_name);
     }
 }
