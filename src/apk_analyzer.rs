@@ -1,6 +1,7 @@
 use std::path::PathBuf;
 use crate::analyzer::archives::Archives;
 use crate::sdk_constants::ANDROID_MANIFEST_XML;
+use crate::manifest::android_manifest_parser::AndroidManifestParser;
 
 pub struct ApkAnalyzer {
 
@@ -13,6 +14,7 @@ impl ApkAnalyzer {
     pub fn apk_summary(&self, apk: PathBuf) -> Vec<u8> {
         let mut manager = Archives::open(apk);
         let data = manager.get(String::from(ANDROID_MANIFEST_XML));
+        AndroidManifestParser::parse(data.clone());
         data
     }
 }
