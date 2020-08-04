@@ -77,12 +77,14 @@ impl TokenSink for SimpleTokenPrinter {
 pub struct AndroidManifestParser {}
 
 impl AndroidManifestParser {
-    pub fn parse(data: Vec<u8>) {
+    pub fn parse(data: Vec<u8>) -> Box<ManifestData> {
         let mut sink = SimpleTokenPrinter::new(ManifestData::new());
         let mut input = String::from_utf8_lossy(data.as_ref()).to_tendril();
         let mut tok = XmlTokenizer::new(sink, Default::default());
         tok.feed(input);
         tok.end();
+
+        tok.sink().clone().manifest_data
     }
 }
 
@@ -105,6 +107,6 @@ mod tests {
         f.read_to_end(&mut buffer).unwrap();
 
         let data = AndroidManifestParser::parse(buffer);
-        // assert_eq!("", data.m_package);
+        assert_eq!("com.android.testapp", data.m_package);
     }
 }
