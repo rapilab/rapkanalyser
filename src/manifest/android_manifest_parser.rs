@@ -49,7 +49,6 @@ pub struct AndroidManifestParser {
 
 }
 
-
 impl AndroidManifestParser {
     pub fn parse(data: Vec<u8>) {
         let sink = SimpleTokenPrinter;
@@ -57,5 +56,27 @@ impl AndroidManifestParser {
         let mut tok = XmlTokenizer::new(sink, Default::default());
         tok.feed(input);
         tok.end();
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::apk_analyzer::ApkAnalyzer;
+    use std::path::PathBuf;
+    use crate::manifest::android_manifest_parser::AndroidManifestParser;
+    use std::fs::File;
+    use std::io::Read;
+
+    #[test]
+    fn should_identify_app_name_from_manifest() {
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/manifest/AndroidManifest-testapp.xml");
+
+        let mut buffer = vec![];
+
+        let mut f = File::open(path).unwrap();
+        f.read_to_end(&mut buffer).unwrap();
+
+        AndroidManifestParser::parse(buffer);
     }
 }

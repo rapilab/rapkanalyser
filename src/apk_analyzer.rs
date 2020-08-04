@@ -19,7 +19,6 @@ impl ApkAnalyzer {
     }
 }
 
-
 #[cfg(test)]
 mod tests {
     use crate::apk_analyzer::ApkAnalyzer;
