@@ -1,1 +1,1 @@
-const ANDROID_MANIFEST_XML: String = String::from("AndroidManifest.xml");
+pub(crate) const ANDROID_MANIFEST_XML: &str = "AndroidManifest.xml";
