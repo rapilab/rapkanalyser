@@ -1,0 +1,1 @@
+const ANDROID_MANIFEST_XML: String = String::from("AndroidManifest.xml");
