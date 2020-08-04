@@ -2,56 +2,83 @@ use xml5ever::parse;
 use xml5ever::rcdom::RcDom;
 use xml5ever::tendril::SliceExt;
 use xml5ever::tendril::{ByteTendril, ReadExt};
-use xml5ever::tokenizer::{CharacterTokens, NullCharacterToken, TagToken};
+use xml5ever::tokenizer::{CharacterTokens, NullCharacterToken, TagToken, TagKind};
 use xml5ever::tokenizer::{CommentToken, PIToken, Pi};
 use xml5ever::tokenizer::{Doctype, DoctypeToken, EOFToken};
 use xml5ever::tokenizer::{ParseError, Token, TokenSink, XmlTokenizer};
+use crate::manifest::manifest_data::ManifestData;
+use std::borrow::{Borrow, BorrowMut};
+use crate::manifest::android_manifest::{NODE_MANIFEST, ATTRIBUTE_PACKAGE};
+use xml5ever::tree_builder::XmlTreeBuilder;
 
-struct SimpleTokenPrinter;
+#[derive(Clone, Debug)]
+pub struct SimpleTokenPrinter {
+    pub manifest_data: Box<ManifestData>
+}
+
+impl SimpleTokenPrinter {
+    pub fn new(manifest: ManifestData) -> SimpleTokenPrinter {
+        SimpleTokenPrinter { manifest_data: Box::from(manifest) }
+    }
+}
 
 impl TokenSink for SimpleTokenPrinter {
     fn process_token(&mut self, token: Token) {
         match token {
             CharacterTokens(b) => {
                 println!("TEXT: {}", &*b);
-            },
+            }
             NullCharacterToken => print!("NULL"),
             TagToken(tag) => {
-                println!("{:?} {} ", tag.kind, &*tag.name.local);
-            },
+                let name = &*tag.name.local;
+                println!("{:?} {} ", tag.kind, name);
+                match tag.kind {
+                    TagKind::StartTag => {
+                        if name == NODE_MANIFEST {
+                            for attr in tag.attrs {
+                                let local_name = &*attr.name.local;
+                                if local_name == ATTRIBUTE_PACKAGE {
+                                    self.manifest_data.m_package = attr.value.parse().unwrap();
+                                }
+                            }
+                        }
+                    }
+                    TagKind::EndTag => {}
+                    TagKind::EmptyTag => {}
+                    TagKind::ShortTag => {}
+                }
+            }
             ParseError(err) => {
                 println!("ERROR: {}", err);
-            },
+            }
             PIToken(Pi {
                         ref target,
                         ref data,
                     }) => {
                 println!("PI : <?{} {}?>", &*target, &*data);
-            },
+            }
             CommentToken(ref comment) => {
                 println!("<!--{:?}-->", &*comment);
-            },
+            }
             EOFToken => {
                 println!("EOF");
-            },
+            }
             DoctypeToken(Doctype {
                              ref name,
                              ref public_id,
                              ..
                          }) => {
                 println!("<!DOCTYPE {:?} {:?}>", &*name, &*public_id);
-            },
+            }
         }
     }
 }
 
-pub struct AndroidManifestParser {
-
-}
+pub struct AndroidManifestParser {}
 
 impl AndroidManifestParser {
     pub fn parse(data: Vec<u8>) {
-        let sink = SimpleTokenPrinter;
+        let mut sink = SimpleTokenPrinter::new(ManifestData::new());
         let mut input = String::from_utf8_lossy(data.as_ref()).to_tendril();
         let mut tok = XmlTokenizer::new(sink, Default::default());
         tok.feed(input);
@@ -77,6 +104,7 @@ mod tests {
         let mut f = File::open(path).unwrap();
         f.read_to_end(&mut buffer).unwrap();
 
-        AndroidManifestParser::parse(buffer);
+        let data = AndroidManifestParser::parse(buffer);
+        // assert_eq!("", data.m_package);
     }
 }
