@@ -3,9 +3,14 @@ use crate::analyzer::archives::Archives;
 use crate::sdk_constants::ANDROID_MANIFEST_XML;
 use crate::manifest::android_manifest_parser::AndroidManifestParser;
 use crate::manifest::manifest_data::ManifestData;
+use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
 
 pub struct ApkAnalyzer {
 
+}
+
+pub fn get_manifest_data(data: Vec<u8>) {
+    BinaryXmlParser::decode_xml(data);
 }
 
 impl ApkAnalyzer {
@@ -15,6 +20,8 @@ impl ApkAnalyzer {
     pub fn apk_summary(&self, apk: PathBuf) -> ManifestData {
         let mut manager = Archives::open(apk);
         let data = manager.get(String::from(ANDROID_MANIFEST_XML));
+
+        get_manifest_data(data.clone());
 
         *AndroidManifestParser::parse(data.clone())
     }
