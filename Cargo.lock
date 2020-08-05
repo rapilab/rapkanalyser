@@ -686,6 +686,7 @@ dependencies = [
 name = "rapkanalyser"
 version = "0.1.0"
 dependencies = [
+ "abxml",
  "byteorder",
  "flate2",
  "lazy_static 1.4.0",
