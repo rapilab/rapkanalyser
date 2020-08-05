@@ -24,8 +24,8 @@ pub enum Chunk<'a> {
 #[derive(Clone)]
 pub struct ChunkParser { pub cursor: Cursor<Vec<u8>> }
 
-impl ChunkParser {
-    pub fn get_chunk(cursor: Cursor<Vec<u8>>) -> ChunkParser {
-        ChunkParser {cursor}
+impl<'a> ChunkParser {
+    pub fn get_chunk(cursor: Cursor<Vec<u8>>) -> Chunk<'a> {
+        Chunk::Unknown
     }
 }

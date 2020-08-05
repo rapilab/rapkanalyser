@@ -1,13 +1,13 @@
-use crate::arsc::chunk::ChunkParser;
+use crate::arsc::chunk::{ChunkParser, Chunk};
 use std::io::{Cursor, Seek};
 use byteorder::{LittleEndian, ReadBytesExt};
 
-pub struct BinaryResourceFile {
-    pub chunks: Vec<ChunkParser>
+pub struct BinaryResourceFile<'a> {
+    pub chunks: Vec<Chunk<'a>>
 }
 
-impl BinaryResourceFile {
-    pub fn new(data: Vec<u8>) -> BinaryResourceFile {
+impl<'a> BinaryResourceFile<'a> {
+    pub fn new(data: Vec<u8>) -> BinaryResourceFile<'a> {
         let mut file = BinaryResourceFile {
             chunks: vec![]
         };
