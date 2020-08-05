@@ -2,6 +2,7 @@ use std::collections::{HashMap, HashSet};
 use dex::Dex;
 use memmap::Mmap;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
+use crate::analyzer::dex::dex_file::DexFile;
 
 #[derive(Debug, Clone)]
 pub struct ProguardUsagesMap {
@@ -45,14 +46,19 @@ impl PackageTreeCreator {
 
     pub fn construct_package_tree(&self, dexes: Vec<Dex<Mmap>>) {
         let mut root = DexPackageNode::new(String::from("root"), None);
-        for dex in dexes {
+        for dex_map in dexes {
+            let dex = DexFile::from(dex_map);
             self.package_tree(&mut root, dex)
         }
     }
 
-    pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
-        // self.getAllMethod(dex);
-        // self.getAllField(dex);
-        // self.getAllType(dex);
+    pub fn get_all_method(&self, dex: DexFile) {}
+    pub fn get_all_field(&self, dex: DexFile) {}
+    pub fn get_all_type(&self, dex: DexFile) {}
+
+    pub fn package_tree(&self, root: &mut DexPackageNode, dex: DexFile) {
+        self.get_all_method(dex.clone());
+        self.get_all_field(dex.clone());
+        self.get_all_type(dex.clone());
     }
 }

@@ -7,6 +7,7 @@ pub mod dex_file_stats;
 
 pub mod package_tree_creator;
 
+pub mod dex_file;
 pub mod dex_package_node;
 pub mod dex_class_node;
 pub mod dex_method_node;
