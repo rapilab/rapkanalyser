@@ -4,9 +4,9 @@ use zip::read::ZipFile;
 
 #[derive(Clone)]
 pub struct ArchiveEntry {
-    path: String,
-    raw_size: u64,
-    download_size: u64,
+    pub(crate) path: String,
+    pub(crate) raw_size: u64,
+    pub(crate) download_size: u64,
 }
 
 impl ArchiveEntry {
@@ -29,7 +29,6 @@ impl ArchiveTreeStructure {
         for i in 0..archive.len() {
             let file = archive.by_index(i).unwrap();
             let entry = ArchiveEntry::from_zip_file(file);
-            println!("{:?}", entry.clone().path);
             results.push(entry);
         }
         results

@@ -35,7 +35,9 @@ impl ApkAnalyzer {
 
     pub fn files_list(&self, apk: PathBuf) -> Vec<ArchiveEntry> {
         let mut manager = Archives::open(apk);
-        ArchiveTreeStructure::create(manager.files)
+        let mut vec = ArchiveTreeStructure::create(manager.files);
+        vec.sort_by(|a, b| a.path.cmp(&b.path));
+        vec
     }
 
     pub fn manifest_print(&self, apk: PathBuf) -> String {
@@ -106,6 +108,9 @@ mod tests {
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
         let files = analyzer.files_list(path);
-        assert_eq!(18, files.len())
+        assert_eq!(18, files.len());
+        // for x in files {
+        //     println!("{:?}， size: {:?}, download_size: {:?}", x.path, x.raw_size, x.download_size);
+        // }
     }
 }
