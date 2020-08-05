@@ -8,11 +8,12 @@ use crate::analyzer::apk_size_calculator::{GzipSizeCalculator, ApkSizeCalculator
 use failure::Error;
 use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry};
 use std::borrow::Cow;
-use dex::DexReader;
+use dex::{DexReader, Dex};
 use crate::analyzer::dex::dex_file_stats::DexFileStats;
 use std::io::{Read, Write};
 use std::fs::File;
 use tempfile::tempdir;
+use memmap::Mmap;
 
 pub struct ApkAnalyzer {}
 
@@ -72,14 +73,27 @@ impl ApkAnalyzer {
     }
 
     pub fn dex_references(&self, apk: PathBuf) -> Vec<DexFileStats> {
-        let mut archive = Archives::open(apk).files;
+        let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
         let mut files_stats: Vec<DexFileStats> = vec![];
+        for x in dexes {
+            files_stats.push(DexFileStats::create(x))
+        }
+
+        files_stats
+    }
+
+    pub fn dex_packages(&self, apk: PathBuf) {
+
+    }
+
+    fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
+        let mut archive = Archives::open(apk).files;
+        let mut dex_results = vec![];
 
         for i in 0..archive.len() {
             let mut zip_file = archive.by_index(i).unwrap();
             let file_name = zip_file.name();
             if file_name.ends_with(".dex") {
-
                 let mut buffer = Vec::new();
                 let dir = tempdir().unwrap();
                 let file_path = dir.path().join(file_name);
@@ -91,14 +105,14 @@ impl ApkAnalyzer {
                 let result = DexReader::from_file(file_path);
                 match result {
                     Ok(data) => {
-                        files_stats.push(DexFileStats::create(data))
-                    },
-                    Err(_) => {},
+                        dex_results.push(data);
+                    }
+                    Err(_) => {}
                 }
             }
         };
 
-        files_stats
+        dex_results
     }
 }
 
