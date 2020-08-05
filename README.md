@@ -54,3 +54,9 @@ Option            Description
 ------            -----------
 --human-readable  Print sizes in human readable format
 ```
+
+## Dump
+
+```
+aapt2 dump badging tests/resources/apk/app_with_virtual_entries.apk
+```
