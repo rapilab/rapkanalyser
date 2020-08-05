@@ -21,3 +21,8 @@ byteorder = "1"
 [lib]
 path = "src/lib.rs"
 name = "analyser"
+
+[workspace]
+members = [
+    "abxml",
+]
