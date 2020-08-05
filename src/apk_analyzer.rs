@@ -15,12 +15,12 @@ impl ApkAnalyzer {
     pub fn new() -> ApkAnalyzer {
         ApkAnalyzer {}
     }
-    pub fn file_size(&self, apk: PathBuf) -> u64 {
+    pub fn apk_file_size(&self, apk: PathBuf) -> u64 {
         let calculator = GzipSizeCalculator::new();
         calculator.get_full_apk_raw_size(apk)
     }
 
-    pub fn download_size(&self, apk: PathBuf) -> u64 {
+    pub fn apk_download_size(&self, apk: PathBuf) -> u64 {
         let calculator = GzipSizeCalculator::new();
         calculator.get_full_apk_download_size(apk)
     }
@@ -79,7 +79,7 @@ mod tests {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
-        let size = analyzer.file_size(path);
+        let size = analyzer.apk_file_size(path);
         assert_eq!(48196, size)
     }
 
@@ -89,7 +89,7 @@ mod tests {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
-        let size = analyzer.download_size(path);
+        let size = analyzer.apk_download_size(path);
         assert_eq!(39591, size)
     }
 }
