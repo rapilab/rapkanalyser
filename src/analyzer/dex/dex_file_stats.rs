@@ -10,13 +10,16 @@ pub struct DexFileStats {
 
 impl DexFileStats {
     pub fn create(dex: Dex<Mmap>) -> DexFileStats {
-        let class_count = dex.classes().len();
+        let mut class_count = 0;
         let mut defined_method_count = 0;
         let mut referenced_method_count = 0;
         for clz_result in dex.classes() {
+            class_count = class_count + 1;
             match clz_result {
                 Ok(clz) => {
-                    defined_method_count += clz.methods().len();
+                    for method in clz.methods() {
+                        defined_method_count = defined_method_count + 1;
+                    }
                 },
                 Err(_) => {},
             }

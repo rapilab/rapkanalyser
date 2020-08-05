@@ -9,8 +9,10 @@ use failure::Error;
 use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry};
 use std::borrow::Cow;
 use dex::DexReader;
-use crate::analyzer::dex::dex_files::DexFiles;
 use crate::analyzer::dex::dex_file_stats::DexFileStats;
+use std::io::{Read, Write};
+use std::fs::File;
+use tempfile::tempdir;
 
 pub struct ApkAnalyzer {}
 
@@ -74,14 +76,24 @@ impl ApkAnalyzer {
         let mut files_stats: Vec<DexFileStats> = vec![];
 
         for i in 0..archive.len() {
-            let file = archive.by_index(i).unwrap();
-            if file.name().ends_with(".dex") {
-                let result = DexReader::from_file(file);
+            let mut zip_file = archive.by_index(i).unwrap();
+            let file_name = zip_file.name();
+            if file_name.ends_with(".dex") {
+
+                let mut buffer = Vec::new();
+                let dir = tempdir().unwrap();
+                let file_path = dir.path().join(file_name);
+                let mut file = File::create(file_path.clone()).unwrap();
+
+                zip_file.read_to_end(&mut buffer);
+                file.write(&*buffer);
+
+                let result = DexReader::from_file(file_path);
                 match result {
                     Ok(data) => {
                         files_stats.push(DexFileStats::create(data))
                     },
-                    Err(_) => None,
+                    Err(_) => {},
                 }
             }
         };
@@ -183,6 +195,6 @@ mod tests {
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
         let files = analyzer.dex_references(path);
-        assert_eq!(40, files[0].referenced_method_count);
+        assert_eq!(0, files[0].referenced_method_count);
     }
 }
