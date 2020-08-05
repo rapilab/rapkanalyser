@@ -14,6 +14,8 @@ use std::io::{Read, Write};
 use std::fs::File;
 use tempfile::tempdir;
 use memmap::Mmap;
+use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
+use crate::analyzer::dex::dex_package_node::DexPackageNode;
 
 pub struct ApkAnalyzer {}
 
@@ -83,7 +85,9 @@ impl ApkAnalyzer {
     }
 
     pub fn dex_packages(&self, apk: PathBuf) {
-
+        let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
+        let creator = PackageTreeCreator::new();
+        creator.construct_package_tree(dexes)
     }
 
     fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
