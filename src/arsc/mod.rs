@@ -1,3 +1,4 @@
+pub mod chunk_header;
 pub mod chunk;
 pub mod binary_resource_file;
 

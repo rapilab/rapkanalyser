@@ -1,7 +1,6 @@
 use crate::arsc::chunk::{ChunkParser, Chunk};
 use std::io::{Cursor, Seek};
 use byteorder::{LittleEndian, ReadBytesExt};
-use crate::byte_stream::ByteStream;
 
 pub struct BinaryResourceFile<'a> {
     pub chunks: Vec<Chunk<'a>>
@@ -13,12 +12,11 @@ impl<'a> BinaryResourceFile<'a> {
             chunks: vec![]
         };
 
-        // let mut rdr = Cursor::new(data);
+        let cursor: Cursor<&[u8]> = Cursor::new(&data);
+        let mut parser = ChunkParser::new(cursor);
 
-        let stream = ByteStream::new(data);
-
-        let chunk = ChunkParser::get_chunk(stream);
-        file.chunks.push(chunk);
+        let chunk = parser.read_one().unwrap();
+        // file.chunks.push(chunk);
 
         file
     }

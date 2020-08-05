@@ -1,4 +1,4 @@
-use std::io::Cursor;
+use std::io::{Cursor, Error};
 use crate::arsc::string_table::StringTableWrapper;
 use crate::arsc::package::PackageWrapper;
 use crate::arsc::table_type_spec::TypeSpecWrapper;
@@ -8,6 +8,7 @@ use crate::arsc::resource::ResourceWrapper;
 use byteorder::{ReadBytesExt, LittleEndian};
 use crate::arsc::xml_chunk::XmlChunk;
 use crate::byte_stream::ByteStream;
+use crate::arsc::chunk_header::ChunkHeader;
 
 pub const NULL: u16 = 0x0000;
 pub const STRING_POOL: u16 = 0x0001;
@@ -43,18 +44,39 @@ pub enum Chunk<'a> {
 }
 
 #[derive(Clone)]
-pub struct ChunkParser { pub cursor: Cursor<Vec<u8>> }
+pub struct ChunkParser<'a> { pub cursor: Cursor<&'a [u8]> }
 
-impl<'a> ChunkParser {
-    pub fn get_chunk(mut stream: ByteStream) -> Chunk<'a> {
+impl<'a> ChunkParser<'a> {
+    pub fn new(cursor: Cursor<&'a [u8]>) -> ChunkParser {
+        ChunkParser { cursor }
+    }
+
+    pub fn read_one(&mut self) -> Result<Chunk<'a>, Error> {
         let result: Chunk;
-        // let token = cursor.read_u16::<LittleEndian>().unwrap();
-        let token = stream.read_short();
+
+        let initial_position = self.cursor.position();
+        let token = self.cursor.read_u16::<LittleEndian>()?;
+        let header_size = self.cursor.read_u16::<LittleEndian>()?;
+        let chunk_size = self.cursor.read_u32::<LittleEndian>()?;
+
+        let chunk_header = ChunkHeader::new(initial_position, header_size, chunk_size, token);
+
+        let chunk = self.get_chunk(&chunk_header);
+
+        self.cursor.set_position(chunk_header.get_chunk_end());
+
+        Ok(chunk)
+    }
+
+    fn get_chunk(&self, header: &ChunkHeader) -> Chunk<'a> {
+        let token = header.get_token();
+
+        let raw_data = self.cursor.get_ref();
+        let slice = &raw_data[header.get_offset() as usize..header.get_chunk_end() as usize];
 
         match token {
             XML => {
-                // result = XmlChunk::new(stream.source);
-                return Chunk::Unknown
+                return XmlChunk::new(slice)
             }
             _ => {}
         }
