@@ -1,7 +1,9 @@
 use std::path::PathBuf;
 use std::fs;
-use std::fs::Metadata;
-use std::io::Error;
+use std::fs::{Metadata, File};
+use std::io::{Error, Read, Write};
+use flate2::write::DeflateEncoder;
+use flate2::Compression;
 
 pub trait ApkSizeCalculator {
     fn get_full_apk_download_size(&self, apk: PathBuf) -> u64;
@@ -28,7 +30,14 @@ impl GzipSizeCalculator {
 
 impl ApkSizeCalculator for GzipSizeCalculator {
     fn get_full_apk_download_size(&self, apk: PathBuf) -> u64 {
-        unimplemented!()
+        let mut buffer = vec![];
+        let mut f = File::open(apk).unwrap();
+        f.read_to_end(&mut buffer).unwrap();
+
+        let mut e = DeflateEncoder::new(Vec::new(), Compression::best());
+        e.write_all(buffer.as_ref()).unwrap();
+        let compressed = e.finish().unwrap();
+        compressed.len() as u64
     }
 
     fn get_full_apk_raw_size(&self, apk: PathBuf) -> u64 {

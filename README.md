@@ -1,5 +1,16 @@
 # rapkanalyser
 
+ - [x] apk file-size
+ - [x] apk download-size
+
+## Diff
+
+```
+~/Library/Android/sdk/tools/bin/apkanalyzer apk download-size /Users/fdhuang/works/android/rapkanalyser/tests/resources/apk/app_with_virtual_entry.apk
+39633
+```
+
+`39633` vs `39591`
 
 ## Document
 
