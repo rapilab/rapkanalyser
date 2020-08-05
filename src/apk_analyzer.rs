@@ -19,18 +19,25 @@ impl ApkAnalyzer {
         let calculator = GzipSizeCalculator::new();
         calculator.get_full_apk_raw_size(apk)
     }
+
     pub fn download_size(&self, apk: PathBuf) -> u64 {
         let calculator = GzipSizeCalculator::new();
         calculator.get_full_apk_download_size(apk)
     }
+
     pub fn apk_summary(&self, apk: PathBuf) -> ManifestData {
+        let result = self.manifest_print(apk);
+
+        let manifest = AndroidManifestParser::parse(Vec::from(result.as_bytes()));
+        *manifest
+    }
+
+    pub fn manifest_print(&self, apk: PathBuf) -> String {
         let mut manager = Archives::open(apk);
         let data = manager.get(String::from(ANDROID_MANIFEST_XML));
 
         let result = BinaryXmlParser::decode_xml(data).unwrap();
-
-        let manifest = AndroidManifestParser::parse(Vec::from(result.as_bytes()));
-        *manifest
+        result
     }
 }
 
@@ -47,6 +54,23 @@ mod tests {
 
         let vec = analyzer.apk_summary(path);
         assert_eq!("com.example.android.multiproject", vec.m_package)
+    }
+
+    #[test]
+    fn should_support_manifest_print() {
+        let analyzer = ApkAnalyzer::new();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/apk/test.apk");
+
+        let string = analyzer.manifest_print(path);
+        assert_eq!("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?>
+<manifest xmlns:android=\"http://schemas.android.com/apk/res/android\" android:versionName=\"1.0\" platformBuildVersionCode=\"23\" package=\"com.example.helloworld\" platformBuildVersionName=\"6.0-2438415\" android:versionCode=\"1\">
+  <uses-sdk android:minSdkVersion=\"3\" />
+  <intent-filter>
+    <action android:name=\"android.intent.action.MAIN\" />
+    <category android:name=\"android.intent.category.LAUNCHER\" />
+  </intent-filter>
+</manifest>".len(), string.len())
     }
 
     #[test]
