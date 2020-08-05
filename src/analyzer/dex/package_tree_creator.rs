@@ -44,9 +44,15 @@ impl PackageTreeCreator {
     }
 
     pub fn construct_package_tree(&self, dexes: Vec<Dex<Mmap>>) {
-        let root = DexPackageNode::new(String::from("root"), None);
+        let mut root = DexPackageNode::new(String::from("root"), None);
         for dex in dexes {
-            // package_tree(root, dex.pa)
+            self.package_tree(&mut root, dex)
         }
+    }
+
+    pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
+        // self.getAllMethod(dex);
+        // self.getAllField(dex);
+        // self.getAllType(dex);
     }
 }
