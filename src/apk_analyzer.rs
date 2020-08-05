@@ -9,9 +9,7 @@ use failure::Error;
 use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry};
 use std::borrow::Cow;
 
-pub struct ApkAnalyzer {
-
-}
+pub struct ApkAnalyzer {}
 
 impl ApkAnalyzer {
     pub fn new() -> ApkAnalyzer {
@@ -41,7 +39,7 @@ impl ApkAnalyzer {
         vec
     }
 
-    pub fn file_cat(&self, apk: PathBuf, name: String) -> String  {
+    pub fn file_cat(&self, apk: PathBuf, name: String) -> String {
         let mut manager = Archives::open(apk);
         let data = manager.get(String::from(name));
         String::from(String::from_utf8_lossy(&*data))
@@ -53,6 +51,19 @@ impl ApkAnalyzer {
 
         let result = BinaryXmlParser::decode_xml(data).unwrap();
         result
+    }
+
+    pub fn dex_list(&self, apk: PathBuf) -> Vec<ArchiveEntry> {
+        let mut archive = Archives::open(apk).files;
+        let mut results = vec![];
+        for i in 0..archive.len() {
+            let file = archive.by_index(i).unwrap();
+            if file.name().ends_with(".dex") {
+                let entry = ArchiveEntry::from_zip_file(file);
+                results.push(entry);
+            }
+        }
+        results
     }
 }
 
@@ -129,5 +140,16 @@ mod tests {
         // for x in files {
         //     println!("{:?}， size: {:?}, download_size: {:?}", x.path, x.raw_size, x.download_size);
         // }
+    }
+
+    #[test]
+    fn should_list_dex() {
+        let analyzer = ApkAnalyzer::new();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/apk/app_with_virtual_entry.apk");
+
+        let files = analyzer.dex_list(path);
+        assert_eq!(1, files.len());
+        assert_eq!("classes.dex", files[0].path);
     }
 }
