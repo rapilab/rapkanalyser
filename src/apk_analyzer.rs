@@ -8,6 +8,9 @@ use crate::analyzer::apk_size_calculator::{GzipSizeCalculator, ApkSizeCalculator
 use failure::Error;
 use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry};
 use std::borrow::Cow;
+use dex::DexReader;
+use crate::analyzer::dex::dex_files::DexFiles;
+use crate::analyzer::dex::dex_file_stats::DexFileStats;
 
 pub struct ApkAnalyzer {}
 
@@ -64,6 +67,26 @@ impl ApkAnalyzer {
             }
         }
         results
+    }
+
+    pub fn dex_references(&self, apk: PathBuf) -> Vec<DexFileStats> {
+        let mut archive = Archives::open(apk).files;
+        let mut files_stats: Vec<DexFileStats> = vec![];
+
+        for i in 0..archive.len() {
+            let file = archive.by_index(i).unwrap();
+            if file.name().ends_with(".dex") {
+                let result = DexReader::from_file(file);
+                match result {
+                    Ok(data) => {
+                        files_stats.push(DexFileStats::create(data))
+                    },
+                    Err(_) => None,
+                }
+            }
+        };
+
+        files_stats
     }
 }
 
@@ -151,5 +174,15 @@ mod tests {
         let files = analyzer.dex_list(path);
         assert_eq!(1, files.len());
         assert_eq!("classes.dex", files[0].path);
+    }
+
+    #[test]
+    fn should_list_dex_references() {
+        let analyzer = ApkAnalyzer::new();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/apk/app_with_virtual_entry.apk");
+
+        let files = analyzer.dex_references(path);
+        assert_eq!(40, files[0].referenced_method_count);
     }
 }
