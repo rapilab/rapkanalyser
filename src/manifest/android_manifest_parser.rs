@@ -26,12 +26,12 @@ impl TokenSink for SimpleTokenPrinter {
     fn process_token(&mut self, token: Token) {
         match token {
             CharacterTokens(b) => {
-                println!("TEXT: {}", &*b);
+                // println!("TEXT: {}", &*b);
             }
             NullCharacterToken => print!("NULL"),
             TagToken(tag) => {
                 let name = &*tag.name.local;
-                println!("{:?} {} ", tag.kind, name);
+                // println!("{:?} {} ", tag.kind, name);
                 match tag.kind {
                     TagKind::StartTag => {
                         if name == NODE_MANIFEST {
@@ -55,26 +55,26 @@ impl TokenSink for SimpleTokenPrinter {
                 }
             }
             ParseError(err) => {
-                println!("ERROR: {}", err);
+                // println!("ERROR: {}", err);
             }
             PIToken(Pi {
                         ref target,
                         ref data,
                     }) => {
-                println!("PI : <?{} {}?>", &*target, &*data);
+                // println!("PI : <?{} {}?>", &*target, &*data);
             }
             CommentToken(ref comment) => {
-                println!("<!--{:?}-->", &*comment);
+                // println!("<!--{:?}-->", &*comment);
             }
             EOFToken => {
-                println!("EOF");
+                // println!("EOF");
             }
             DoctypeToken(Doctype {
                              ref name,
                              ref public_id,
                              ..
                          }) => {
-                println!("<!DOCTYPE {:?} {:?}>", &*name, &*public_id);
+                // println!("<!DOCTYPE {:?} {:?}>", &*name, &*public_id);
             }
         }
     }
