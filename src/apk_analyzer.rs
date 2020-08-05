@@ -195,6 +195,6 @@ mod tests {
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
         let files = analyzer.dex_references(path);
-        assert_eq!(0, files[0].referenced_method_count);
+        assert_eq!(40, files[0].referenced_method_count);
     }
 }

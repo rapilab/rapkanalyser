@@ -25,6 +25,10 @@ impl DexFileStats {
             }
         }
 
+        for x in dex.method_ids() {
+            referenced_method_count = referenced_method_count + 1;
+        }
+
         DexFileStats {
             class_count,
             defined_method_count,
