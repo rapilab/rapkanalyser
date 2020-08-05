@@ -4,12 +4,12 @@ use abxml::visitor::{ModelVisitor, XmlVisitor, Executor};
 use abxml::decoder::Decoder;
 
 pub struct BinaryResourceFile {
-    pub data: Vec<u8>
+
 }
 
 impl BinaryResourceFile {
     pub fn new() -> BinaryResourceFile {
-        BinaryResourceFile { data }
+        BinaryResourceFile { }
     }
 
     pub fn decode(&self, content: Vec<u8>) {
@@ -18,7 +18,7 @@ impl BinaryResourceFile {
         let mut decoder = Decoder {
             visitor,
             buffer_android: &*empty_arsc,
-            buffer_apk: &*empty_arsc,
+            buffer_apk: &*content.clone(),
         };
 
         let cursor = Cursor::new(content.as_ref());
