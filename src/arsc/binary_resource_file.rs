@@ -1,9 +1,9 @@
-use crate::arsc::chunk::Chunk;
+use crate::arsc::chunk::ChunkParser;
 use std::io::{Cursor, Seek};
 use byteorder::{LittleEndian, ReadBytesExt};
 
 pub struct BinaryResourceFile {
-    pub chunks: Vec<Chunk>
+    pub chunks: Vec<ChunkParser>
 }
 
 impl BinaryResourceFile {
@@ -22,7 +22,7 @@ impl BinaryResourceFile {
         }
 
         if rdr.position() > 0 {
-            let chunk = Chunk::get_chunk(rdr);
+            let chunk = ChunkParser::get_chunk(rdr);
             file.chunks.push(chunk);
         }
         file
