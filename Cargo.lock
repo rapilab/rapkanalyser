@@ -688,6 +688,7 @@ version = "0.1.0"
 dependencies = [
  "abxml",
  "byteorder",
+ "failure",
  "flate2",
  "lazy_static 1.4.0",
  "markup5ever",

@@ -1,6 +1,9 @@
 #[macro_use]
 extern crate lazy_static;
 
+#[macro_use]
+extern crate failure;
+
 extern crate xml5ever;
 
 pub mod sdk_constants;
