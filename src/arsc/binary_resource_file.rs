@@ -14,7 +14,7 @@ impl BinaryResourceFile {
         BinaryResourceFile {}
     }
 
-    pub fn decode_xml(&self, mut cursor: Cursor<&[u8]>) -> Result<(), Error> {
+    pub fn decode_xml(&self, mut cursor: Cursor<&[u8]>) -> Result<String, Error> {
         let token = cursor
             .read_u16::<LittleEndian>()
             .context("error reading first token")?;
@@ -62,7 +62,6 @@ impl BinaryResourceFile {
             };
         };
 
-        println!("{:?}", visitor.get_resources());
-        Ok(())
+        visitor.into_string()
     }
 }

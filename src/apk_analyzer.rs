@@ -5,13 +5,10 @@ use crate::manifest::android_manifest_parser::AndroidManifestParser;
 use crate::manifest::manifest_data::ManifestData;
 use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
 use crate::analyzer::apk_size_calculator::{GzipSizeCalculator, ApkSizeCalculator};
+use failure::Error;
 
 pub struct ApkAnalyzer {
 
-}
-
-pub fn get_manifest_data(data: Vec<u8>) {
-    BinaryXmlParser::decode_xml(data);
 }
 
 impl ApkAnalyzer {
@@ -30,9 +27,9 @@ impl ApkAnalyzer {
         let mut manager = Archives::open(apk);
         let data = manager.get(String::from(ANDROID_MANIFEST_XML));
 
-        get_manifest_data(data.clone());
+        let result = BinaryXmlParser::decode_xml(data).unwrap();
 
-        *AndroidManifestParser::parse(data.clone())
+        *AndroidManifestParser::parse(Vec::from(result.as_bytes()))
     }
 }
 
@@ -48,7 +45,7 @@ mod tests {
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
         let vec = analyzer.apk_summary(path);
-        // assert_eq!("com.example.android.multiproject", vec.m_package)
+        assert_eq!("com.example.android.multiproject", vec.m_package)
     }
 
     #[test]
