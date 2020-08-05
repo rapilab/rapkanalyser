@@ -29,7 +29,8 @@ impl ApkAnalyzer {
 
         let result = BinaryXmlParser::decode_xml(data).unwrap();
 
-        *AndroidManifestParser::parse(Vec::from(result.as_bytes()))
+        let manifest = AndroidManifestParser::parse(Vec::from(result.as_bytes()));
+        *manifest
     }
 }
 
