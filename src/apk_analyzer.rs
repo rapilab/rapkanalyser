@@ -6,6 +6,7 @@ use crate::manifest::manifest_data::ManifestData;
 use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
 use crate::analyzer::apk_size_calculator::{GzipSizeCalculator, ApkSizeCalculator};
 use failure::Error;
+use crate::analyzer::archive_tree_structure::ArchiveTreeStructure;
 
 pub struct ApkAnalyzer {
 
@@ -30,6 +31,11 @@ impl ApkAnalyzer {
 
         let manifest = AndroidManifestParser::parse(Vec::from(result.as_bytes()));
         *manifest
+    }
+
+    pub fn files_list(&self, apk: PathBuf) {
+        let mut manager = Archives::open(apk);
+        ArchiveTreeStructure::create(manager.files);
     }
 
     pub fn manifest_print(&self, apk: PathBuf) -> String {
@@ -91,5 +97,15 @@ mod tests {
 
         let size = analyzer.apk_download_size(path);
         assert_eq!(39591, size)
+    }
+
+    #[test]
+    fn should_list_files() {
+        let analyzer = ApkAnalyzer::new();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/apk/app_with_virtual_entry.apk");
+
+        analyzer.files_list(path);
+        // assert_eq!(39591, size)
     }
 }
