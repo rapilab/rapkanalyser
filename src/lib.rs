@@ -9,3 +9,4 @@ pub mod analyzer;
 pub mod manifest;
 pub mod binary_xml;
 pub mod arsc;
+pub mod byte_stream;
