@@ -86,7 +86,7 @@ impl ApkAnalyzer {
         files_stats
     }
 
-    pub fn dump_tree(&self, node: DexElementNode) -> String {
+    pub fn dump_tree(&self, node: DexElementNode, parent_info: String) -> String {
         let mut node_type: &str = "";
         let some = "d ";
 
@@ -96,27 +96,30 @@ impl ApkAnalyzer {
             DexElementNode::DexPackage(pkg) => {
                 node_type = "P ";
                 node_name = pkg.name;
-            },
+            }
             DexElementNode::DexClass(clz) => {
                 node_type = "C ";
                 node_name = clz.name;
-            },
+            }
             DexElementNode::DexMethod(method) => {
                 node_type = "M ";
                 node_name = method.name;
-            },
+            }
             DexElementNode::DexField(field) => {
                 node_type = "F ";
                 node_name = field.name;
-            },
+            }
         }
 
-        let string = format!("{} {} {}", node_type, some, node_name);
+        let string = format!("{} {} {} {}", node_type, some, parent_info, node_name);
         println!("{}", string);
-        match node {
+        match node.clone() {
             DexElementNode::DexPackage(pkg) => {
                 for class_node in pkg.class_nodes {
-                    self.dump_tree(DexElementNode::DexClass(class_node.clone()));
+                    let info =  format!("{}.{}", pkg.name, class_node.name);
+                    self.dump_tree(DexElementNode::DexClass(
+                        class_node.clone()), String::from(info)
+                    );
                 }
             }
             DexElementNode::DexClass(clz) => {
@@ -124,11 +127,17 @@ impl ApkAnalyzer {
                     // self.dump_tree(DexElementNode::DexMethod(method.clone()));
                     match child {
                         DexElementNode::DexMethod(method) => {
-                            self.dump_tree(DexElementNode::DexMethod(method.clone()));
-                        },
+                            let info =  format!("{}.{}", parent_info, clz.name);
+                            self.dump_tree(DexElementNode::DexMethod(
+                                method.clone()), String::from(info)
+                            );
+                        }
                         DexElementNode::DexField(field) => {
-                            self.dump_tree(DexElementNode::DexField(field.clone()));
-                        },
+                            let info =  format!("{}.{}", parent_info, clz.name);
+                            self.dump_tree(DexElementNode::DexField(
+                                field.clone()), String::from(info)
+                            );
+                        }
                         _ => {}
                     }
                 }
@@ -141,7 +150,7 @@ impl ApkAnalyzer {
         let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
         let creator = PackageTreeCreator::new();
         let node = creator.construct_package_tree(dexes);
-        self.dump_tree(DexElementNode::DexPackage(node.clone()));
+        self.dump_tree(DexElementNode::DexPackage(node.clone()), String::from(""));
         node
     }
 
