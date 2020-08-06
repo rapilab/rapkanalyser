@@ -33,7 +33,7 @@ impl BinaryResourceFile {
         // TODO: Avoid infinite loop
         cursor.set_position(u64::from(header_size));
 
-        let stream = ChunkLoaderStream::new(cursor);
+        let stream = ChunkLoaderStream::new(cursor.clone());
         let mut origin = Origin::Global;
 
         // let resources = Resources { packages: Default::default(), main_package: None };
@@ -60,13 +60,17 @@ impl BinaryResourceFile {
             }
         };
 
-        // let resources = Resources { packages: Default::default(), main_package: None };
-        let mut xml_visitor = XmlVisitor::new(visitor.get_resources());
-        let result = xml_visitor.into_string();
-        result
+        let resources = visitor.get_resources();
+        let result = BinaryResourceFile::xml(cursor, &resources);
+        Ok(String::from(""))
     }
 
     pub fn decode_xml(&self, mut cursor: Cursor<&[u8]>) -> Result<String, Error> {
+        let resources = Resources { packages: Default::default(), main_package: None };
+        BinaryResourceFile::xml(cursor, &resources)
+    }
+
+    fn xml(mut cursor: Cursor<&[u8]>, resources: &Resources) -> Result<String, Error> {
         let token = cursor
             .read_u16::<LittleEndian>()
             .context("error reading first token")?;
@@ -84,8 +88,8 @@ impl BinaryResourceFile {
         cursor.set_position(u64::from(header_size));
         let stream = ChunkLoaderStream::new(cursor);
 
-        let resources = Resources { packages: Default::default(), main_package: None };
         let mut visitor = XmlVisitor::new(resources.borrow());
+
         for c in stream {
             let chunk = c.context("error reading next chunk")?;
             match chunk {
