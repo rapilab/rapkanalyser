@@ -182,6 +182,10 @@ impl ApkAnalyzer {
 
         dex_results
     }
+
+    pub fn res_package(&self, apk: PathBuf)  {
+
+    }
 }
 
 #[cfg(test)]
@@ -287,7 +291,6 @@ mod tests {
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
         let node = analyzer.dex_packages(path);
-        // dumpTree(node)
-        // assert_eq!(40, files[0].referenced_method_count);
+        assert_eq!(10, node.class_nodes.len());
     }
 }
