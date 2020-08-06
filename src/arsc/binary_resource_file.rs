@@ -12,6 +12,60 @@ impl BinaryResourceFile {
         BinaryResourceFile {}
     }
 
+    pub fn decode_arsc(&self, mut cursor: Cursor<&[u8]>) -> Result<String, Error> {
+        let token = cursor
+            .read_u16::<LittleEndian>()
+            .context("error reading first token")?;
+
+        if token != 0x2 {
+            bail!("file does not start with ARSC token: {:X}", token);
+        }
+
+        let header_size = cursor
+            .read_u16::<LittleEndian>()
+            .context("error reading header size")?;
+        let _chunk_size = cursor
+            .read_u32::<LittleEndian>()
+            .context("error reading chunk size")?;
+        let _package_amount = cursor
+            .read_u32::<LittleEndian>()
+            .context("error reading package amount")?;
+        // TODO: Avoid infinite loop
+        cursor.set_position(u64::from(header_size));
+
+        let stream = ChunkLoaderStream::new(cursor);
+        let mut origin = Origin::Global;
+
+        // let resources = Resources { packages: Default::default(), main_package: None };
+        let mut visitor = ModelVisitor::default();
+
+        for c in stream {
+            match c.context("error reading next chunk")? {
+                Chunk::StringTable(stw) => {
+                    visitor.visit_string_table(stw, origin);
+                    origin = Origin::next(origin);
+                }
+                Chunk::Package(pw) => {
+                    visitor.visit_package(pw);
+                }
+                Chunk::TableType(ttw) => {
+                    visitor.visit_table_type(ttw);
+                }
+                Chunk::TableTypeSpec(tsw) => {
+                    visitor.visit_type_spec(tsw);
+                }
+                _ => {
+                    // warn!("Not expected chunk on ARSC");
+                }
+            }
+        };
+
+        // let resources = Resources { packages: Default::default(), main_package: None };
+        let mut xml_visitor = XmlVisitor::new(visitor.get_resources());
+        let result = xml_visitor.into_string();
+        result
+    }
+
     pub fn decode_xml(&self, mut cursor: Cursor<&[u8]>) -> Result<String, Error> {
         let token = cursor
             .read_u16::<LittleEndian>()

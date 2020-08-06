@@ -10,13 +10,15 @@ use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry
 
 use dex::{DexReader, Dex};
 use crate::analyzer::dex::dex_file_stats::DexFileStats;
-use std::io::{Read, Write};
+use std::io::{Read, Write, Cursor};
 use std::fs::File;
 use tempfile::tempdir;
 use memmap::Mmap;
 use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
 use crate::analyzer::dex::DexElementNode;
+use crate::arsc::binary_resource_file::BinaryResourceFile;
+use failure::Error;
 
 fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
     let mut archive = Archives::open(apk).files;
@@ -181,12 +183,13 @@ impl ApkAnalyzer {
         node
     }
 
-    pub fn res_package(&self, apk: PathBuf)  {
+    pub fn res_package(&self, apk: PathBuf) -> Result<String, Error> {
         let mut manager = Archives::open(apk);
         let data = manager.get(String::from(RESOURCES_ARSC));
 
-        // let result = BinaryXmlParser::decode_xml(data).unwrap();
-        // println!("{:?}", result);
+        let file = BinaryResourceFile::new();
+        let cursor: Cursor<&[u8]> = Cursor::new(&*data);
+        file.decode_arsc(cursor)
     }
 }
 
@@ -194,6 +197,7 @@ impl ApkAnalyzer {
 mod tests {
     use crate::apk_analyzer::ApkAnalyzer;
     use std::path::PathBuf;
+    use failure::Error;
 
     #[test]
     fn should_identify_application_name_from_apk() {
@@ -303,6 +307,11 @@ mod tests {
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
         let node = analyzer.res_package(path);
-        // assert_eq!(10, node.class_nodes.len());
+        match node {
+            Ok(str) => {
+                println!("{:?}", str);
+            },
+            Err(_) => {},
+        }
     }
 }
