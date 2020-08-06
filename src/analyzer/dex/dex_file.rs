@@ -5,7 +5,7 @@ use dex::class::{Class, ClassDefItem};
 #[derive(Debug)]
 pub struct DexFile {
     classes: Vec<Class>,
-    class_defs: Vec<ClassDefItem>
+    class_defs: Vec<ClassDefItem>,
 }
 
 impl DexFile {

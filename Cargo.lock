@@ -463,6 +463,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "multi-map"
+version = "1.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "bba551d6d795f74a01767577ea8339560bf0a65354e0417b7e915ed608443d46"
+
+[[package]]
 name = "new_debug_unreachable"
 version = "1.0.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -805,6 +811,7 @@ dependencies = [
  "lazy_static 1.4.0",
  "markup5ever",
  "memmap",
+ "multi-map",
  "tempfile",
  "xml5ever",
  "zip",

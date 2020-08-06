@@ -215,4 +215,14 @@ mod tests {
         let files = analyzer.dex_references(path);
         assert_eq!(40, files[0].referenced_method_count);
     }
+
+    #[test]
+    fn should_list_dex_package() {
+        let analyzer = ApkAnalyzer::new();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/apk/app_with_virtual_entry.apk");
+
+        let files = analyzer.dex_packages(path);
+        // assert_eq!(40, files[0].referenced_method_count);
+    }
 }
