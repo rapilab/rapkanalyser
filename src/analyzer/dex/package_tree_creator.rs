@@ -52,13 +52,13 @@ impl PackageTreeCreator {
         }
     }
 
-    pub fn get_all_method(&self, dex: DexFile) {}
-    pub fn get_all_field(&self, dex: DexFile) {}
-    pub fn get_all_type(&self, dex: DexFile) {}
+    pub fn get_all_method(&self, dex: &DexFile) {}
+    pub fn get_all_field(&self, dex: &DexFile) {}
+    pub fn get_all_type(&self, dex: &DexFile) {}
 
     pub fn package_tree(&self, root: &mut DexPackageNode, dex: DexFile) {
-        self.get_all_method(dex.clone());
-        self.get_all_field(dex.clone());
-        self.get_all_type(dex.clone());
+        self.get_all_method(&dex);
+        self.get_all_field(&dex);
+        self.get_all_type(&dex);
     }
 }
