@@ -1,11 +1,9 @@
 use std::io::{Cursor, Seek};
 use byteorder::{LittleEndian, ReadBytesExt};
 use abxml::visitor::{ModelVisitor, XmlVisitor, Executor, ChunkVisitor, Origin, Resources};
-use abxml::decoder::Decoder;
 use abxml::chunks::{ChunkLoaderStream, Chunk};
 use failure::{ResultExt, Error};
 use std::borrow::Borrow;
-use abxml::model::Element;
 
 pub struct BinaryResourceFile {}
 

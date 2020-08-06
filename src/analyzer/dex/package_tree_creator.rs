@@ -50,32 +50,22 @@ impl PackageTreeCreator {
     pub fn construct_package_tree(&self, dexes: Vec<Dex<Mmap>>) {
         let mut root = DexPackageNode::new(String::from("root"), None);
         for dex_map in dexes {
-            let dex = DexFile::from(dex_map);
-            self.package_tree(&mut root, dex)
+            // let dex = DexFile::from(dex_map);
+            self.package_tree(&mut root, dex_map)
         }
     }
 
-    pub fn get_all_method(&self, dex: &DexFile) -> MultiMap<String, String, &Method> {
-        let mut map = MultiMap::new();
-        for clz in &dex.classes {
-            for method in clz.methods() {
-                let source_file = clz.source_file().unwrap();
-                map.insert(source_file.to_string(), String::from(""), method.clone());
-            }
-        }
+    // pub fn get_all_method(&self, dex: &DexFile) {}
+    // pub fn get_all_field(&self, dex: &DexFile) {}
+    // pub fn get_all_type(&self, dex: &DexFile) {}
 
-        map
-    }
-    pub fn get_all_field(&self, dex: &DexFile) {}
-    pub fn get_all_type(&self, dex: &DexFile) {}
-
-    pub fn package_tree(&self, root: &mut DexPackageNode, dex: DexFile) {
-        let method_map = self.get_all_method(&dex);
+    pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
+        // let method_map = self.get_all_method(dex);
         // self.get_all_field(&dex);
         // self.get_all_type(&dex);
 
-        for clz in &dex.classes {
-
+        for clz in dex.classes() {
+            println!("{:?}", clz);
         }
     }
 }
