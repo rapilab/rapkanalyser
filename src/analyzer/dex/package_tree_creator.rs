@@ -9,6 +9,7 @@ use dex::method::Method;
 use dex::field::Field;
 use getset::{CopyGetters, Getters, MutGetters, Setters};
 use crate::analyzer::dex::dex_method_node::DexMethodNode;
+use crate::analyzer::dex::dex_field_node::DexFieldNode;
 
 #[derive(Debug, Clone)]
 pub struct ProguardUsagesMap {
@@ -53,7 +54,6 @@ impl PackageTreeCreator {
     pub fn construct_package_tree(&self, dexes: Vec<Dex<Mmap>>) -> DexPackageNode {
         let mut root = DexPackageNode::new(String::from("root"), None);
         for dex_map in dexes {
-            // let dex = DexFile::from(dex_map);
             self.package_tree(&mut root, dex_map)
         }
 
@@ -79,7 +79,16 @@ impl PackageTreeCreator {
             class_node.add_method(method_node);
         }
     }
-    pub fn add_fields(&self, class_node: &DexClassNode, fields: Vec<&Field>) {}
+    pub fn add_fields(&self, class_node: &mut DexClassNode, fields: Vec<&Field>) {
+        for field in fields {
+            let field_name = field.name();
+            let field_type = field.jtype().type_descriptor();
+            let field_sig = format!("{:?} {:?}", field_type, field_name);
+
+            let field_node = DexFieldNode::new(field_sig);
+            class_node.add_field(field_node);
+        }
+    }
 
     pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
         // add classes (and their methods and fields) defined in this file to the tree
@@ -106,7 +115,9 @@ impl PackageTreeCreator {
                     }
 
                     self.add_methods(&mut class_node, methods);
-                    self.add_fields(&class_node, fields);
+                    self.add_fields(&mut class_node, fields);
+
+                    root.add_class(class_node)
                 }
 
             }

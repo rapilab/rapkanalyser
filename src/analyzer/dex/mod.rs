@@ -13,6 +13,7 @@ pub mod dex_class_node;
 pub mod dex_method_node;
 pub mod dex_field_node;
 
+#[derive(Clone)]
 pub enum DexElementNode {
     DexPackage(DexPackageNode),
     DexClass(DexClassNode),

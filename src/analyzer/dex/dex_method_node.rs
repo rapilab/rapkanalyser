@@ -1,11 +1,12 @@
+#[derive(Clone)]
 pub struct DexMethodNode {
-    pub method_sig: String
+    pub name: String
 }
 
 impl DexMethodNode {
-    pub fn new(method_sig: String) -> DexMethodNode {
-        DexMethodNode {
-            method_sig
+    pub fn new(name: String) -> Self {
+        Self {
+            name
         }
     }
 }

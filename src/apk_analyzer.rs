@@ -88,7 +88,8 @@ impl ApkAnalyzer {
     pub fn dex_packages(&self, apk: PathBuf) -> DexPackageNode {
         let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
         let creator = PackageTreeCreator::new();
-        creator.construct_package_tree(dexes)
+        let node = creator.construct_package_tree(dexes);
+        node
     }
 
     fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {

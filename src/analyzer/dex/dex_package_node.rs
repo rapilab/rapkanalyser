@@ -4,6 +4,7 @@ use crate::analyzer::dex::dex_class_node::DexClassNode;
 pub struct DexPackageNode {
     name: String,
     package_name: Option<String>,
+    class_nodes: Vec<DexClassNode>
 }
 
 impl DexPackageNode {
@@ -11,6 +12,7 @@ impl DexPackageNode {
         DexPackageNode {
             name,
             package_name,
+            class_nodes: vec![]
         }
     }
 
@@ -22,8 +24,12 @@ impl DexPackageNode {
         }
     }
 
+    pub fn add_class(&mut self, class_node: DexClassNode) {
+        self.class_nodes.push((class_node));
+    }
+
     pub fn get_or_create_class(&self, parent_package: String, class_name: String, typ: String) -> DexClassNode {
-        let mut dex_class: DexClassNode = DexClassNode::new(String::from(""));
+        let mut dex_class: DexClassNode = DexClassNode::new(String::from(class_name.clone()));
         let option = class_name.find(".");
         match option {
             None => {}
