@@ -1,4 +1,4 @@
-use std::io::{Cursor, Seek};
+use std::io::{Cursor};
 use byteorder::{LittleEndian, ReadBytesExt};
 use abxml::visitor::{ModelVisitor, XmlVisitor, Executor, ChunkVisitor, Origin, Resources};
 use abxml::chunks::{ChunkLoaderStream, Chunk};

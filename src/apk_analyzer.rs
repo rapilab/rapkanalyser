@@ -5,9 +5,9 @@ use crate::manifest::android_manifest_parser::AndroidManifestParser;
 use crate::manifest::manifest_data::ManifestData;
 use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
 use crate::analyzer::apk_size_calculator::{GzipSizeCalculator, ApkSizeCalculator};
-use failure::Error;
+
 use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry};
-use std::borrow::Cow;
+
 use dex::{DexReader, Dex};
 use crate::analyzer::dex::dex_file_stats::DexFileStats;
 use std::io::{Read, Write};
@@ -15,7 +15,7 @@ use std::fs::File;
 use tempfile::tempdir;
 use memmap::Mmap;
 use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
-use crate::analyzer::dex::dex_package_node::DexPackageNode;
+
 
 pub struct ApkAnalyzer {}
 
@@ -41,7 +41,7 @@ impl ApkAnalyzer {
     }
 
     pub fn files_list(&self, apk: PathBuf) -> Vec<ArchiveEntry> {
-        let mut manager = Archives::open(apk);
+        let manager = Archives::open(apk);
         let mut vec = ArchiveTreeStructure::create(manager.files);
         vec.sort_by(|a, b| a.path.cmp(&b.path));
         vec
@@ -222,7 +222,7 @@ mod tests {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
-        let files = analyzer.dex_packages(path);
+        let _files = analyzer.dex_packages(path);
         // assert_eq!(40, files[0].referenced_method_count);
     }
 }

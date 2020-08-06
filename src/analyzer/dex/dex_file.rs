@@ -1,4 +1,4 @@
-use dex::{Dex, Error};
+use dex::{Dex};
 use memmap::Mmap;
 use dex::class::{Class, ClassDefItem};
 

@@ -2,10 +2,10 @@ use std::collections::{HashMap, HashSet};
 use dex::Dex;
 use memmap::Mmap;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
-use crate::analyzer::dex::dex_file::DexFile;
-use multi_map::MultiMap;
-use dex::string::DexString;
-use dex::method::Method;
+
+
+
+
 
 #[derive(Debug, Clone)]
 pub struct ProguardUsagesMap {
@@ -59,7 +59,7 @@ impl PackageTreeCreator {
     // pub fn get_all_field(&self, dex: &DexFile) {}
     // pub fn get_all_type(&self, dex: &DexFile) {}
 
-    pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
+    pub fn package_tree(&self, _root: &mut DexPackageNode, dex: Dex<Mmap>) {
         // let method_map = self.get_all_method(dex);
         // self.get_all_field(&dex);
         // self.get_all_type(&dex);

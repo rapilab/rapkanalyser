@@ -1,7 +1,7 @@
 use std::path::PathBuf;
 use std::fs;
-use std::fs::{Metadata, File};
-use std::io::{Error, Read, Write};
+use std::fs::{File};
+use std::io::{Read, Write};
 use flate2::write::DeflateEncoder;
 use flate2::Compression;
 
@@ -22,7 +22,7 @@ impl GzipSizeCalculator {
     }
 
     // todo: add verify apk file
-    pub fn verify(&self, apk: PathBuf) -> bool {
+    pub fn verify(&self, _apk: PathBuf) -> bool {
         // let mut zip = zip::ZipArchive::new(reader).unwrap();
         true
     }
@@ -55,11 +55,11 @@ impl ApkSizeCalculator for GzipSizeCalculator {
         return 0
     }
 
-    fn get_download_size_per_file(&self, apk: PathBuf) -> u64 {
+    fn get_download_size_per_file(&self, _apk: PathBuf) -> u64 {
         unimplemented!()
     }
 
-    fn get_raw_size_per_file(&self, apk: PathBuf) -> u64 {
+    fn get_raw_size_per_file(&self, _apk: PathBuf) -> u64 {
         unimplemented!()
     }
 }
