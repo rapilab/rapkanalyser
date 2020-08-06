@@ -1,3 +1,5 @@
+use crate::analyzer::dex::dex_class_node::DexClassNode;
+
 #[derive(Clone)]
 pub struct DexPackageNode {
     name: String,
@@ -20,12 +22,17 @@ impl DexPackageNode {
         }
     }
 
-    pub fn get_or_create_class(&self, parent_package: String, class_name: String, typ: String) {
+    pub fn get_or_create_class(&self, parent_package: String, class_name: String, typ: String) -> DexClassNode {
+        let mut dex_class: DexClassNode = DexClassNode::new(String::from(""));
         let option = class_name.find(".");
         match option {
             None => {}
-            Some(size) => {}
-        }
+            Some(size) => {
+
+            }
+        };
+
+        dex_class
     }
 }
 

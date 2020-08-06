@@ -2,6 +2,9 @@
 extern crate lazy_static;
 
 #[macro_use]
+extern crate getset;
+
+#[macro_use]
 extern crate failure;
 
 extern crate xml5ever;

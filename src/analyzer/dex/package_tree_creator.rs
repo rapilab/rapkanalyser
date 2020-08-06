@@ -4,7 +4,11 @@ use memmap::Mmap;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
 use dex::class::Class;
 use dex::string::DexString;
-
+use crate::analyzer::dex::dex_class_node::DexClassNode;
+use dex::method::Method;
+use dex::field::Field;
+use getset::{CopyGetters, Getters, MutGetters, Setters};
+use crate::analyzer::dex::dex_method_node::DexMethodNode;
 
 #[derive(Debug, Clone)]
 pub struct ProguardUsagesMap {
@@ -64,6 +68,19 @@ impl PackageTreeCreator {
     pub fn add_lost_field(&self) {}
     pub fn add_proguard_removed_def(&self) {}
 
+    pub fn add_methods(&self, class_node: &mut DexClassNode, methods: Vec<&Method>) {
+        for method in methods {
+            let method_name = method.name();
+            let return_type = method.return_type().type_descriptor();
+            // method.params()
+            let params = String::from("");
+            let method_sig = format!("{:?} {:?}({:?})", method_name, return_type, params);
+            let method_node = DexMethodNode::new(method_sig);
+            class_node.add_method(method_node);
+        }
+    }
+    pub fn add_fields(&self, class_node: &DexClassNode, fields: Vec<&Field>) {}
+
     pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
         // add classes (and their methods and fields) defined in this file to the tree
         for x in dex.classes() {
@@ -76,7 +93,20 @@ impl PackageTreeCreator {
                         if let Some(str) = opt { typ = str }
                     }
 
-                    root.get_or_create_class(String::from(""), String::from(clz_name), String::from(typ))
+                    let mut class_node = root.get_or_create_class(String::from(""), String::from(clz_name), String::from(typ));
+
+                    let mut methods = vec![];
+                    for x in clz.methods() {
+                        methods.push(x)
+                    }
+
+                    let mut fields = vec![];
+                    for x in clz.fields() {
+                        fields.push(x)
+                    }
+
+                    self.add_methods(&mut class_node, methods);
+                    self.add_fields(&class_node, fields);
                 }
 
             }

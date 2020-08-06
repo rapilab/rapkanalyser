@@ -808,6 +808,7 @@ dependencies = [
  "dex",
  "failure",
  "flate2",
+ "getset",
  "lazy_static 1.4.0",
  "markup5ever",
  "memmap",
