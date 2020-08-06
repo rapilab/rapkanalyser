@@ -23,12 +23,23 @@ impl DexPackageNode {
     pub fn get_or_create_class(&self, parent_package: String, class_name: String, typ: String) {
         let option = class_name.find(".");
         match option {
-            None => {
-
-            },
-            Some(size) => {
-
-            },
+            None => {}
+            Some(size) => {}
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::analyzer::dex::dex_package_node::DexPackageNode;
+
+    #[test]
+    fn should_create_class() {
+        let node = DexPackageNode::new(String::from("Hello"), Some(String::from("com.phodal")));
+        node.get_or_create_class(
+            String::from("com.phodal"),
+            String::from("Hello"),
+            String::from("AA"));
+
     }
 }
