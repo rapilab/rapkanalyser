@@ -111,8 +111,8 @@ impl ApkAnalyzer {
             },
         }
 
-        let string = format!("{:?}, {:?}, {:?}", node_type, some, node_name);
-        println!("{:?}", string);
+        let string = format!("{} {} {}", node_type, some, node_name);
+        println!("{}", string);
         match node {
             DexElementNode::DexPackage(pkg) => {
                 for class_node in pkg.class_nodes {

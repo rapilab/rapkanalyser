@@ -74,7 +74,7 @@ impl PackageTreeCreator {
             let return_type = method.return_type().type_descriptor().to_string();
             // method.params()
             let params = String::from("");
-            let method_sig = format!("{:?} {:?}({:?})", method_name, return_type, params);
+            let method_sig = format!("{} {}({})", method_name, return_type, params);
             let method_node = DexMethodNode::new(method_sig);
             class_node.add_method(method_node);
         }
@@ -83,7 +83,7 @@ impl PackageTreeCreator {
         for field in fields {
             let field_name = field.name().to_string();
             let field_type = field.jtype().type_descriptor().to_string();
-            let field_sig = format!("{:?} {:?}", field_type, field_name);
+            let field_sig = format!("{} {}", field_type, field_name);
 
             let field_node = DexFieldNode::new(field_sig);
             class_node.add_field(field_node);
