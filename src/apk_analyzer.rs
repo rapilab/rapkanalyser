@@ -119,6 +119,20 @@ impl ApkAnalyzer {
                     self.dump_tree(DexElementNode::DexClass(class_node.clone()));
                 }
             }
+            DexElementNode::DexClass(clz) => {
+                for child in clz.child {
+                    // self.dump_tree(DexElementNode::DexMethod(method.clone()));
+                    match child {
+                        DexElementNode::DexMethod(method) => {
+                            self.dump_tree(DexElementNode::DexMethod(method.clone()));
+                        },
+                        DexElementNode::DexField(field) => {
+                            self.dump_tree(DexElementNode::DexField(field.clone()));
+                        },
+                        _ => {}
+                    }
+                }
+            }
             _ => {}
         }
         string

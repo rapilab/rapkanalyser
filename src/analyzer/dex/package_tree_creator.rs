@@ -70,8 +70,8 @@ impl PackageTreeCreator {
 
     pub fn add_methods(&self, class_node: &mut DexClassNode, methods: Vec<&Method>) {
         for method in methods {
-            let method_name = method.name();
-            let return_type = method.return_type().type_descriptor();
+            let method_name = method.name().to_string();
+            let return_type = method.return_type().type_descriptor().to_string();
             // method.params()
             let params = String::from("");
             let method_sig = format!("{:?} {:?}({:?})", method_name, return_type, params);
@@ -81,8 +81,8 @@ impl PackageTreeCreator {
     }
     pub fn add_fields(&self, class_node: &mut DexClassNode, fields: Vec<&Field>) {
         for field in fields {
-            let field_name = field.name();
-            let field_type = field.jtype().type_descriptor();
+            let field_name = field.name().to_string();
+            let field_type = field.jtype().type_descriptor().to_string();
             let field_sig = format!("{:?} {:?}", field_type, field_name);
 
             let field_node = DexFieldNode::new(field_sig);
