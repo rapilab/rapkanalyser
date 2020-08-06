@@ -1,10 +1,9 @@
 use std::collections::{HashMap, HashSet};
-use dex::Dex;
+use dex::{Dex, Error};
 use memmap::Mmap;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
-
-
-
+use dex::class::Class;
+use dex::string::DexString;
 
 
 #[derive(Debug, Clone)]
@@ -59,13 +58,21 @@ impl PackageTreeCreator {
     // pub fn get_all_field(&self, dex: &DexFile) {}
     // pub fn get_all_type(&self, dex: &DexFile) {}
 
-    pub fn package_tree(&self, _root: &mut DexPackageNode, dex: Dex<Mmap>) {
-        // let method_map = self.get_all_method(dex);
-        // self.get_all_field(&dex);
-        // self.get_all_type(&dex);
+    pub fn package_tree(&self, root: &mut DexPackageNode, dex: Dex<Mmap>) {
+        for x in dex.classes() {
+            if let Ok(clz) = x {
+                if let Some(source) = clz.source_file() {
+                    let clz_name = source.to_string();
+                    let mut typ: String = String::from("");
 
-        for clz in dex.classes() {
-            println!("{:?}", clz);
+                    if let Ok(opt) = clz.signature() {
+                        if let Some(str) = opt { typ = str }
+                    }
+
+                    root.get_or_create_class(String::from(""), String::from(clz_name), String::from(typ))
+                }
+
+            }
         }
     }
 }
