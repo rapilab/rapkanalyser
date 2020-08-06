@@ -4,6 +4,8 @@ use memmap::Mmap;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
 use crate::analyzer::dex::dex_file::DexFile;
 use multi_map::MultiMap;
+use dex::string::DexString;
+use dex::method::Method;
 
 #[derive(Debug, Clone)]
 pub struct ProguardUsagesMap {
@@ -53,17 +55,27 @@ impl PackageTreeCreator {
         }
     }
 
-    pub fn get_all_method(&self, dex: &DexFile) {
-        // let mut methods_by_class = MultiMap::new();
-        // dex.ge
+    pub fn get_all_method(&self, dex: &DexFile) -> MultiMap<String, String, &Method> {
+        let mut map = MultiMap::new();
+        for clz in &dex.classes {
+            for method in clz.methods() {
+                let source_file = clz.source_file().unwrap();
+                map.insert(source_file.to_string(), String::from(""), method.clone());
+            }
+        }
+
+        map
     }
     pub fn get_all_field(&self, dex: &DexFile) {}
     pub fn get_all_type(&self, dex: &DexFile) {}
 
     pub fn package_tree(&self, root: &mut DexPackageNode, dex: DexFile) {
-        // self.get_all_method(&dex);
+        let method_map = self.get_all_method(&dex);
         // self.get_all_field(&dex);
         // self.get_all_type(&dex);
-        
+
+        for clz in &dex.classes {
+
+        }
     }
 }
