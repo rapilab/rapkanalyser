@@ -4,7 +4,7 @@ use crate::analyzer::dex::dex_field_node::DexFieldNode;
 
 #[derive(Clone)]
 pub struct DexClassNode {
-    name: String,
+    pub(crate) name: String,
     child: Vec<DexElementNode>
 }
 

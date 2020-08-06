@@ -2,9 +2,9 @@ use crate::analyzer::dex::dex_class_node::DexClassNode;
 
 #[derive(Clone)]
 pub struct DexPackageNode {
-    name: String,
+    pub(crate) name: String,
     package_name: Option<String>,
-    class_nodes: Vec<DexClassNode>
+    pub(crate) class_nodes: Vec<DexClassNode>
 }
 
 impl DexPackageNode {

@@ -16,6 +16,7 @@ use tempfile::tempdir;
 use memmap::Mmap;
 use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
+use crate::analyzer::dex::DexElementNode;
 
 
 pub struct ApkAnalyzer {}
@@ -85,10 +86,48 @@ impl ApkAnalyzer {
         files_stats
     }
 
+    pub fn dump_tree(&self, node: DexElementNode) -> String {
+        let mut node_type: &str = "";
+        let some = "d ";
+
+        let mut node_name: String = String::from("");
+
+        match node.clone() {
+            DexElementNode::DexPackage(pkg) => {
+                node_type = "P ";
+                node_name = pkg.name;
+            },
+            DexElementNode::DexClass(clz) => {
+                node_type = "C ";
+                node_name = clz.name;
+            },
+            DexElementNode::DexMethod(method) => {
+                node_type = "M ";
+                node_name = method.name;
+            },
+            DexElementNode::DexField(field) => {
+                node_type = "F ";
+                node_name = field.name;
+            },
+        }
+
+        let string = format!("{:?}, {:?}, {:?}", node_type, some, node_name);
+        println!("{:?}", string);
+        match node {
+            DexElementNode::DexPackage(pkg) => {
+                for class_node in pkg.class_nodes {
+                    self.dump_tree(DexElementNode::DexClass(class_node.clone()));
+                }
+            }
+            _ => {}
+        }
+        string
+    }
     pub fn dex_packages(&self, apk: PathBuf) -> DexPackageNode {
         let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
         let creator = PackageTreeCreator::new();
         let node = creator.construct_package_tree(dexes);
+        self.dump_tree(DexElementNode::DexPackage(node.clone()));
         node
     }
 
@@ -224,7 +263,8 @@ mod tests {
         let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
         path.push("tests/resources/apk/app_with_virtual_entry.apk");
 
-        let _files = analyzer.dex_packages(path);
+        let node = analyzer.dex_packages(path);
+        // dumpTree(node)
         // assert_eq!(40, files[0].referenced_method_count);
     }
 }
