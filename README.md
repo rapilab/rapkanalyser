@@ -1,14 +1,18 @@
 # rapkanalyser
 
- - [x] apk_file_size
- - [x] apk_download_size
- - [x] apk_summary
- - [x] files_list
- - [x] file_cat
- - [x] manifest_print
- - [x] dex_list
- - [x] dex_references
- - [x] dex_packages
+ - apk
+   - [x] apk_file_size
+   - [x] apk_download_size
+   - [x] apk_summary
+ - file
+   - [x] files_list
+   - [x] file_cat
+ - manifest
+   - [x] manifest_print
+ - dex
+   - [x] dex_list
+   - [x] dex_references
+   - [x] dex_packages
 
 ## Diff
 
