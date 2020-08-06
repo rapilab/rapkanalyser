@@ -1,6 +1,6 @@
 use std::path::PathBuf;
 use crate::analyzer::archives::Archives;
-use crate::sdk_constants::ANDROID_MANIFEST_XML;
+use crate::sdk_constants::{ANDROID_MANIFEST_XML, RESOURCES_ARSC};
 use crate::manifest::android_manifest_parser::AndroidManifestParser;
 use crate::manifest::manifest_data::ManifestData;
 use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
@@ -18,6 +18,34 @@ use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
 use crate::analyzer::dex::DexElementNode;
 
+fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
+    let mut archive = Archives::open(apk).files;
+    let mut dex_results = vec![];
+
+    for i in 0..archive.len() {
+        let mut zip_file = archive.by_index(i).unwrap();
+        let file_name = zip_file.name();
+        if file_name.ends_with(".dex") {
+            let mut buffer = Vec::new();
+            let dir = tempdir().unwrap();
+            let file_path = dir.path().join(file_name);
+            let mut file = File::create(file_path.clone()).unwrap();
+
+            zip_file.read_to_end(&mut buffer);
+            file.write(&*buffer);
+
+            let result = DexReader::from_file(file_path);
+            match result {
+                Ok(data) => {
+                    dex_results.push(data);
+                }
+                Err(_) => {}
+            }
+        }
+    };
+
+    dex_results
+}
 
 pub struct ApkAnalyzer {}
 
@@ -37,7 +65,6 @@ impl ApkAnalyzer {
 
     pub fn apk_summary(&self, apk: PathBuf) -> ManifestData {
         let result = self.manifest_print(apk);
-
         let manifest = AndroidManifestParser::parse(Vec::from(result.as_bytes()));
         *manifest
     }
@@ -77,7 +104,7 @@ impl ApkAnalyzer {
     }
 
     pub fn dex_references(&self, apk: PathBuf) -> Vec<DexFileStats> {
-        let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
+        let dexes = get_all_dex_from_apk(apk);
         let mut files_stats: Vec<DexFileStats> = vec![];
         for x in dexes {
             files_stats.push(DexFileStats::create(x))
@@ -147,44 +174,19 @@ impl ApkAnalyzer {
         string
     }
     pub fn dex_packages(&self, apk: PathBuf) -> DexPackageNode {
-        let dexes = ApkAnalyzer::get_all_dex_from_apk(apk);
+        let dexes = get_all_dex_from_apk(apk);
         let creator = PackageTreeCreator::new();
         let node = creator.construct_package_tree(dexes);
         self.dump_tree(DexElementNode::DexPackage(node.clone()), String::from(""));
         node
     }
 
-    fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
-        let mut archive = Archives::open(apk).files;
-        let mut dex_results = vec![];
-
-        for i in 0..archive.len() {
-            let mut zip_file = archive.by_index(i).unwrap();
-            let file_name = zip_file.name();
-            if file_name.ends_with(".dex") {
-                let mut buffer = Vec::new();
-                let dir = tempdir().unwrap();
-                let file_path = dir.path().join(file_name);
-                let mut file = File::create(file_path.clone()).unwrap();
-
-                zip_file.read_to_end(&mut buffer);
-                file.write(&*buffer);
-
-                let result = DexReader::from_file(file_path);
-                match result {
-                    Ok(data) => {
-                        dex_results.push(data);
-                    }
-                    Err(_) => {}
-                }
-            }
-        };
-
-        dex_results
-    }
-
     pub fn res_package(&self, apk: PathBuf)  {
+        let mut manager = Archives::open(apk);
+        let data = manager.get(String::from(RESOURCES_ARSC));
 
+        // let result = BinaryXmlParser::decode_xml(data).unwrap();
+        // println!("{:?}", result);
     }
 }
 
@@ -292,5 +294,15 @@ mod tests {
 
         let node = analyzer.dex_packages(path);
         assert_eq!(10, node.class_nodes.len());
+    }
+
+    #[test]
+    fn should_get_res_package() {
+        let analyzer = ApkAnalyzer::new();
+        let mut path = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        path.push("tests/resources/apk/app_with_virtual_entry.apk");
+
+        let node = analyzer.res_package(path);
+        // assert_eq!(10, node.class_nodes.len());
     }
 }
