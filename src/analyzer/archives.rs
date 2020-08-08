@@ -1,9 +1,7 @@
-use std::path::PathBuf;
 use crate::analyzer::archive_manager::ArchiveManager;
+use std::path::PathBuf;
 
-pub struct Archives {
-
-}
+pub struct Archives {}
 
 impl Archives {
     pub fn open(apk_path: PathBuf) -> ArchiveManager {

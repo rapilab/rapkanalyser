@@ -1,11 +1,10 @@
+use dex::Dex;
 use memmap::Mmap;
-use dex::{Dex};
-
 
 pub struct DexFileStats {
     pub class_count: usize,
     pub defined_method_count: usize,
-    pub referenced_method_count: usize
+    pub referenced_method_count: usize,
 }
 
 impl DexFileStats {
@@ -20,8 +19,8 @@ impl DexFileStats {
                     for _method in clz.methods() {
                         defined_method_count = defined_method_count + 1;
                     }
-                },
-                Err(_) => {},
+                }
+                Err(_) => {}
             }
         }
 

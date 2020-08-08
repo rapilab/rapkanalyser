@@ -1,15 +1,15 @@
-use std::collections::{HashMap, HashSet};
-use dex::{Dex, Error};
-use memmap::Mmap;
+use crate::analyzer::dex::dex_class_node::DexClassNode;
+use crate::analyzer::dex::dex_field_node::DexFieldNode;
+use crate::analyzer::dex::dex_method_node::DexMethodNode;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
 use dex::class::Class;
-use dex::string::DexString;
-use crate::analyzer::dex::dex_class_node::DexClassNode;
-use dex::method::Method;
 use dex::field::Field;
+use dex::method::Method;
+use dex::string::DexString;
+use dex::{Dex, Error};
 use getset::{CopyGetters, Getters, MutGetters, Setters};
-use crate::analyzer::dex::dex_method_node::DexMethodNode;
-use crate::analyzer::dex::dex_field_node::DexFieldNode;
+use memmap::Mmap;
+use std::collections::{HashMap, HashSet};
 
 #[derive(Debug, Clone)]
 pub struct ProguardUsagesMap {
@@ -40,14 +40,14 @@ impl ProguardMap {
 #[derive(Debug, Clone)]
 pub struct PackageTreeCreator {
     proguard_map: ProguardMap,
-    usages_map: ProguardUsagesMap
+    usages_map: ProguardUsagesMap,
 }
 
 impl PackageTreeCreator {
     pub fn new() -> PackageTreeCreator {
         PackageTreeCreator {
             proguard_map: ProguardMap::new(),
-            usages_map: ProguardUsagesMap::new()
+            usages_map: ProguardUsagesMap::new(),
         }
     }
 
@@ -99,10 +99,16 @@ impl PackageTreeCreator {
                     let mut typ: String = String::from("");
 
                     if let Ok(opt) = clz.signature() {
-                        if let Some(str) = opt { typ = str }
+                        if let Some(str) = opt {
+                            typ = str
+                        }
                     }
 
-                    let mut class_node = root.get_or_create_class(String::from(""), String::from(clz_name), String::from(typ));
+                    let mut class_node = root.get_or_create_class(
+                        String::from(""),
+                        String::from(clz_name),
+                        String::from(typ),
+                    );
 
                     let mut methods = vec![];
                     for x in clz.methods() {
@@ -119,7 +125,6 @@ impl PackageTreeCreator {
 
                     root.add_class(class_node)
                 }
-
             }
         }
 

@@ -1,7 +1,3 @@
-pub struct ArchiveTreeNode {
+pub struct ArchiveTreeNode {}
 
-}
-
-impl ArchiveTreeNode {
-
-}
+impl ArchiveTreeNode {}

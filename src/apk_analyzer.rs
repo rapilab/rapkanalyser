@@ -1,24 +1,24 @@
-use std::path::PathBuf;
+use crate::analyzer::apk_size_calculator::{ApkSizeCalculator, GzipSizeCalculator};
 use crate::analyzer::archives::Archives;
-use crate::sdk_constants::{ANDROID_MANIFEST_XML, RESOURCES_ARSC};
+use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
 use crate::manifest::android_manifest_parser::AndroidManifestParser;
 use crate::manifest::manifest_data::ManifestData;
-use crate::binary_xml::binary_xml_parser::BinaryXmlParser;
-use crate::analyzer::apk_size_calculator::{GzipSizeCalculator, ApkSizeCalculator};
+use crate::sdk_constants::{ANDROID_MANIFEST_XML, RESOURCES_ARSC};
+use std::path::PathBuf;
 
-use crate::analyzer::archive_tree_structure::{ArchiveTreeStructure, ArchiveEntry};
+use crate::analyzer::archive_tree_structure::{ArchiveEntry, ArchiveTreeStructure};
 
-use dex::{DexReader, Dex};
 use crate::analyzer::dex::dex_file_stats::DexFileStats;
-use std::io::{Read, Write, Cursor};
-use std::fs::File;
-use tempfile::tempdir;
-use memmap::Mmap;
-use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
 use crate::analyzer::dex::dex_package_node::DexPackageNode;
+use crate::analyzer::dex::package_tree_creator::PackageTreeCreator;
 use crate::analyzer::dex::DexElementNode;
 use crate::arsc::binary_resource_file::BinaryResourceFile;
+use dex::{Dex, DexReader};
 use failure::Error;
+use memmap::Mmap;
+use std::fs::File;
+use std::io::{Cursor, Read, Write};
+use tempfile::tempdir;
 
 fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
     let mut archive = Archives::open(apk).files;
@@ -44,7 +44,7 @@ fn get_all_dex_from_apk(apk: PathBuf) -> Vec<Dex<Mmap>> {
                 Err(_) => {}
             }
         }
-    };
+    }
 
     dex_results
 }
@@ -145,9 +145,10 @@ impl ApkAnalyzer {
         match node.clone() {
             DexElementNode::DexPackage(pkg) => {
                 for class_node in pkg.class_nodes {
-                    let info =  format!("{}.{}", pkg.name, class_node.name);
-                    self.dump_tree(DexElementNode::DexClass(
-                        class_node.clone()), String::from(info)
+                    let info = format!("{}.{}", pkg.name, class_node.name);
+                    self.dump_tree(
+                        DexElementNode::DexClass(class_node.clone()),
+                        String::from(info),
                     );
                 }
             }
@@ -156,15 +157,17 @@ impl ApkAnalyzer {
                     // self.dump_tree(DexElementNode::DexMethod(method.clone()));
                     match child {
                         DexElementNode::DexMethod(method) => {
-                            let info =  format!("{}.{}", parent_info, clz.name);
-                            self.dump_tree(DexElementNode::DexMethod(
-                                method.clone()), String::from(info)
+                            let info = format!("{}.{}", parent_info, clz.name);
+                            self.dump_tree(
+                                DexElementNode::DexMethod(method.clone()),
+                                String::from(info),
                             );
                         }
                         DexElementNode::DexField(field) => {
-                            let info =  format!("{}.{}", parent_info, clz.name);
-                            self.dump_tree(DexElementNode::DexField(
-                                field.clone()), String::from(info)
+                            let info = format!("{}.{}", parent_info, clz.name);
+                            self.dump_tree(
+                                DexElementNode::DexField(field.clone()),
+                                String::from(info),
                             );
                         }
                         _ => {}
@@ -196,8 +199,8 @@ impl ApkAnalyzer {
 #[cfg(test)]
 mod tests {
     use crate::apk_analyzer::ApkAnalyzer;
-    use std::path::PathBuf;
     use failure::Error;
+    use std::path::PathBuf;
 
     #[test]
     fn should_identify_application_name_from_apk() {
@@ -310,8 +313,8 @@ mod tests {
         match node {
             Ok(str) => {
                 println!("{:?}", str);
-            },
-            Err(_) => {},
+            }
+            Err(_) => {}
         }
     }
 }

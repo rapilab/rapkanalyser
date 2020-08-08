@@ -1,10 +1,8 @@
 use crate::arsc::binary_resource_file::BinaryResourceFile;
-use std::io::Cursor;
 use failure::Error;
+use std::io::Cursor;
 
-pub struct BinaryXmlParser {
-
-}
+pub struct BinaryXmlParser {}
 
 impl BinaryXmlParser {
     pub fn decode_xml(data: Vec<u8>) -> Result<String, Error> {
@@ -13,4 +11,3 @@ impl BinaryXmlParser {
         file.decode_xml(cursor)
     }
 }
-

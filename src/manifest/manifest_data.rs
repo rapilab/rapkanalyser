@@ -6,7 +6,10 @@ pub struct Activity {
 
 impl Activity {
     pub fn new() -> Activity {
-        Activity { m_name: "".to_string(), m_is_exported: false }
+        Activity {
+            m_name: "".to_string(),
+            m_is_exported: false,
+        }
     }
 }
 

@@ -1,6 +1,6 @@
 use std::fs::File;
-use zip::ZipArchive;
 use zip::read::ZipFile;
+use zip::ZipArchive;
 
 #[derive(Clone)]
 pub struct ArchiveEntry {
@@ -12,16 +12,18 @@ pub struct ArchiveEntry {
 impl ArchiveEntry {
     pub fn from_zip_file(file: ZipFile) -> ArchiveEntry {
         ArchiveEntry {
-            path: file.sanitized_name().into_os_string().into_string().unwrap(),
+            path: file
+                .sanitized_name()
+                .into_os_string()
+                .into_string()
+                .unwrap(),
             raw_size: file.size(),
-            download_size: file.compressed_size()
+            download_size: file.compressed_size(),
         }
     }
 }
 
-pub struct ArchiveTreeStructure {
-
-}
+pub struct ArchiveTreeStructure {}
 
 impl ArchiveTreeStructure {
     pub fn create(mut archive: ZipArchive<File>) -> Vec<ArchiveEntry> {
@@ -34,4 +36,3 @@ impl ArchiveTreeStructure {
         results
     }
 }
-

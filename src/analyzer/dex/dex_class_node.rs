@@ -1,18 +1,18 @@
+use crate::analyzer::dex::dex_field_node::DexFieldNode;
 use crate::analyzer::dex::dex_method_node::DexMethodNode;
 use crate::analyzer::dex::DexElementNode;
-use crate::analyzer::dex::dex_field_node::DexFieldNode;
 
 #[derive(Clone)]
 pub struct DexClassNode {
     pub(crate) name: String,
-    pub(crate) child: Vec<DexElementNode>
+    pub(crate) child: Vec<DexElementNode>,
 }
 
 impl DexClassNode {
     pub fn new(name: String) -> DexClassNode {
         DexClassNode {
             name,
-            child: vec![]
+            child: vec![],
         }
     }
 

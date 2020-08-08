@@ -1,9 +1,9 @@
-use std::io::{Cursor};
+use abxml::chunks::{Chunk, ChunkLoaderStream};
+use abxml::visitor::{ChunkVisitor, Executor, ModelVisitor, Origin, Resources, XmlVisitor};
 use byteorder::{LittleEndian, ReadBytesExt};
-use abxml::visitor::{ModelVisitor, XmlVisitor, Executor, ChunkVisitor, Origin, Resources};
-use abxml::chunks::{ChunkLoaderStream, Chunk};
-use failure::{ResultExt, Error};
+use failure::{Error, ResultExt};
 use std::borrow::Borrow;
+use std::io::Cursor;
 
 pub struct BinaryResourceFile {}
 
@@ -58,7 +58,7 @@ impl BinaryResourceFile {
                     // warn!("Not expected chunk on ARSC");
                 }
             }
-        };
+        }
 
         let resources = visitor.get_resources();
         let result = BinaryResourceFile::xml(cursor, &resources);
@@ -66,7 +66,10 @@ impl BinaryResourceFile {
     }
 
     pub fn decode_xml(&self, mut cursor: Cursor<&[u8]>) -> Result<String, Error> {
-        let resources = Resources { packages: Default::default(), main_package: None };
+        let resources = Resources {
+            packages: Default::default(),
+            main_package: None,
+        };
         BinaryResourceFile::xml(cursor, &resources)
     }
 
@@ -116,7 +119,7 @@ impl BinaryResourceFile {
                 }
                 _ => (),
             };
-        };
+        }
 
         visitor.into_string()
     }

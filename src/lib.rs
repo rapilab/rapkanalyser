@@ -9,12 +9,12 @@ extern crate failure;
 
 extern crate xml5ever;
 
-pub mod sdk_constants;
-pub mod apk_analyzer;
 pub mod analyzer;
-pub mod manifest;
-pub mod binary_xml;
+pub mod apk_analyzer;
 pub mod arsc;
+pub mod binary_xml;
 pub mod byte_stream;
+pub mod manifest;
+pub mod sdk_constants;
 
 extern crate multi_map;

@@ -1,24 +1,25 @@
-
-
 use xml5ever::tendril::SliceExt;
 
-use xml5ever::tokenizer::{CharacterTokens, NullCharacterToken, TagToken, TagKind};
+use crate::manifest::manifest_data::ManifestData;
+use xml5ever::tokenizer::{CharacterTokens, NullCharacterToken, TagKind, TagToken};
 use xml5ever::tokenizer::{CommentToken, PIToken, Pi};
 use xml5ever::tokenizer::{Doctype, DoctypeToken, EOFToken};
 use xml5ever::tokenizer::{ParseError, Token, TokenSink, XmlTokenizer};
-use crate::manifest::manifest_data::ManifestData;
 
-use crate::manifest::android_manifest::{NODE_MANIFEST, ATTRIBUTE_PACKAGE, ATTRIBUTE_VERSIONCODE, ATTRIBUTE_VERSIONNAME};
-
+use crate::manifest::android_manifest::{
+    ATTRIBUTE_PACKAGE, ATTRIBUTE_VERSIONCODE, ATTRIBUTE_VERSIONNAME, NODE_MANIFEST,
+};
 
 #[derive(Clone, Debug)]
 pub struct SimpleTokenPrinter {
-    pub manifest_data: Box<ManifestData>
+    pub manifest_data: Box<ManifestData>,
 }
 
 impl SimpleTokenPrinter {
     pub fn new(manifest: ManifestData) -> SimpleTokenPrinter {
-        SimpleTokenPrinter { manifest_data: Box::from(manifest) }
+        SimpleTokenPrinter {
+            manifest_data: Box::from(manifest),
+        }
     }
 }
 
@@ -57,10 +58,7 @@ impl TokenSink for SimpleTokenPrinter {
             ParseError(_err) => {
                 // println!("ERROR: {}", err);
             }
-            PIToken(Pi {
-                        target: _,
-                        data: _,
-                    }) => {
+            PIToken(Pi { target: _, data: _ }) => {
                 // println!("PI : <?{} {}?>", &*target, &*data);
             }
             CommentToken(_comment) => {
@@ -70,10 +68,10 @@ impl TokenSink for SimpleTokenPrinter {
                 // println!("EOF");
             }
             DoctypeToken(Doctype {
-                             name: _,
-                             public_id: _,
-                             ..
-                         }) => {
+                name: _,
+                public_id: _,
+                ..
+            }) => {
                 // println!("<!DOCTYPE {:?} {:?}>", &*name, &*public_id);
             }
         }
@@ -96,11 +94,11 @@ impl AndroidManifestParser {
 
 #[cfg(test)]
 mod tests {
-    
-    use std::path::PathBuf;
+
     use crate::manifest::android_manifest_parser::AndroidManifestParser;
     use std::fs::File;
     use std::io::Read;
+    use std::path::PathBuf;
 
     #[test]
     fn should_identify_app_name_from_manifest() {
